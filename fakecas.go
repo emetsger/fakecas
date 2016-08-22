@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
+	"github.com/labstack/gommon/log"
 	"github.com/rs/cors"
 	"gopkg.in/mgo.v2"
 	"html/template"
@@ -17,6 +18,7 @@ var (
 	OSFHost               = flag.String("osfhost", "localhost:5000", "The osf host to bind to")
 	DatabaseName          = flag.String("dbname", "osf20130903", "The name of your OSF database")
 	DatabaseAddress       = flag.String("dbaddress", "localhost:27017", "The address of your mongodb. ie: localhost:27017")
+	Debug		      = flag.Bool("debug", false, "Debug the echo server")
 	DatabaseSession       mgo.Session
 	UserCollection        *mgo.Collection
 	AccessTokenCollection *mgo.Collection
@@ -26,6 +28,11 @@ func main() {
 	fmt.Println("Starting FakeCAS 0.8.0")
 	flag.Parse()
 	e := echo.New()
+	if *Debug {
+		fmt.Println("Debugging the echo server")
+		e.SetDebug(true)
+		e.SetLogLevel(log.DEBUG)
+	}
 	e.Use(mw.LoggerWithConfig(mw.LoggerConfig{
 		Format: "${time_rfc3339} ${method} ${uri} ${status} ${response_time} ${response_size}\n",
 		Output: os.Stdout,
